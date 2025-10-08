@@ -173,3 +173,47 @@ https-port=443
 - Use Docker or Kubernetes ingress for containerized setups
 
 ---
+
+## Multi-Tenancy in Keycloak: Two Approaches
+
+### 1. Multiple Realms (Traditional Approach)
+
+- Each tenant gets its own realm.
+
+- Pros: Strong isolation, separate configurations.
+
+- Cons: High resource usage, complex management at scale.
+
+### 2️. Single Realm + Organizations (Recommended for SaaS)
+
+Introduced in Keycloak 26+, this feature enables multi-tenancy within a single realm using organizational boundaries.
+
+**Key Features:**
+
+- Create and manage multiple organizations inside one realm.
+
+- Invite and onboard users per organization.
+
+- Identity-first login and organization-specific authentication flows.
+
+- Propagate organization-specific claims in tokens for authorization.
+
+- Centralized management with reduced overhead.
+
+### Implementation Highlights
+
+- Enable “Organizations” in realm settings via Admin Console.
+
+- Create organizations with unique aliases and redirect URLs.
+
+- Assign users, roles, and identity providers per organization.
+
+- Customize login flows and token claims based on organization context.
+
+### Why Organizations > Multiple Realms?
+
+- **Resource Efficiency:** Avoids memory and CPU overhead of multiple realms.
+
+- **Centralized Management:** Easier to maintain shared configs and extensions.
+
+- **Scalability:** More sustainable for large-scale SaaS platforms.
