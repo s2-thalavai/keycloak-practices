@@ -102,19 +102,20 @@ On Windows Server: Use NGINX for Windows or run via WSL.
 
 ## 2. Obtain TLS Certificates
 
-Option A: Let’s Encrypt (Linux only)
+**Option A:** Let’s Encrypt (Linux only)
 
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d your-domain.com
 ```
 
-Option B: Manual Certificates
+**Option B:** Manual Certificates
+
 Place your certs in /etc/nginx/ssl/:
 
-fullchain.pem → Certificate
-
-privkey.pem → Private key
+    fullchain.pem → Certificate
+    
+    privkey.pem → Private key
 
 ## 3. Configure NGINX Reverse Proxy
 Edit /etc/nginx/sites-available/keycloak.conf:
