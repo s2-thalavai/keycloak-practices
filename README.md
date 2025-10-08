@@ -217,3 +217,66 @@ Introduced in Keycloak 26+, this feature enables multi-tenancy within a single r
 - **Centralized Management:** Easier to maintain shared configs and extensions.
 
 - **Scalability:** More sustainable for large-scale SaaS platforms.
+
+---
+
+# Keycloak Multi-Tenancy with Organizations (Post Keycloak 26+)
+
+## Why Use Organizations?
+
+| Feature                  | Multiple Realms         | Organizations (Single Realm)     |
+|--------------------------|-------------------------|----------------------------------|
+| Isolation                | Strong (per realm)      | Logical (per org)               |
+| Resource Efficiency      | High overhead           | Lightweight, scalable           |
+| Shared Config Extensions | Hard to maintain        | Centralized and reusable        |
+| Token Customization      | Realm-specific          | Org-specific claims supported   |
+| SaaS Onboarding          | Complex                 | Streamlined via identity-first  |
+
+---
+
+## Setup Guide
+
+### 1. Enable Organizations
+- Navigate to **Realm Settings → Organizations**
+- Toggle `Enabled` to `true`
+
+### 2. Create Organizations
+- Go to **Organizations → Create**
+- Define:
+  - **Name**: e.g., `AcmeCorp`
+  - **Alias**: used in login URLs
+  - **Redirect URI**: post-login destination
+
+### 3. Invite Users
+- Use **Organization Invitations** to onboard users
+- Assign roles and groups per organization
+
+### 4. Customize Login Flow
+- Enable **Identity-First Login**:
+  - Users enter email → Keycloak detects org → routes to org-specific flow
+- Customize themes or flows per org if needed
+
+### 5. Token Customization
+- Add org-specific claims via **Protocol Mappers**
+- Example: `"org_id": "AcmeCorp"` in access token
+
+---
+
+## Example Login Flow
+
+```plaintext
+1. User enters email → user@acme.com
+2. Keycloak detects `AcmeCorp` via domain mapping
+3. Routes to AcmeCorp login flow
+4. Token includes org-specific claims
+```
+
+---
+
+## Audit & Compliance Tips
+
+- Enable event logging per organization
+
+- Use custom attributes for org metadata
+
+- Externalize org configs via REST API for CI/CD
