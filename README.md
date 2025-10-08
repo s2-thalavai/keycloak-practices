@@ -67,6 +67,9 @@ cd C:\Keycloak\bin
 
 Access Keycloak at: http://localhost:8080
 
+<img width="1366" height="728" alt="image" src="https://github.com/user-attachments/assets/9c42def0-9869-48b3-aaf7-0a4e29624eb9" />
+
+
 ### Create Admin User
 
 On first launch, Keycloak prompts for:
