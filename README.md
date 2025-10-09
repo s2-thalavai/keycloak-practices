@@ -690,3 +690,47 @@ Use access_token (not id_token) for API calls
 Inspect tokens at jwt.ms
 
 Confirm aud, iss, and exp match your policy
+
+---
+
+# Full inbound Policy Block
+
+````xml
+<inbound>
+  <!-- Validate JWT from Keycloak -->
+  <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized">
+    <openid-config url="http://localhost:8180/realms/is_apps/.well-known/openid-configuration" />
+    <required-claims>
+      <claim name="aud">
+        <value>external_users_client</value>
+      </claim>
+      <claim name="iss">
+        <value>http://localhost:8180/realms/is_apps</value>
+      </claim>
+    </required-claims>
+  </validate-jwt>
+
+  <!-- Role-Based Access Control -->
+  <choose>
+    <when condition="@(context.Principal.Claims.Any(c => c.Type == 'realm_access.roles' && c.Value.Contains('admin')))">
+      <!-- Access granted to 'admin' role -->
+    </when>
+    <otherwise>
+      <return-response>
+        <set-status code="403" reason="Forbidden" />
+        <set-body>Access denied: insufficient role</set-body>
+      </return-response>
+    </otherwise>
+  </choose>
+
+  <!-- Conditional Routing Based on Claims -->
+  <choose>
+    <when condition="@(context.Principal.Claims.Any(c => c.Type == 'preferred_username' && c.Value == 'siva'))">
+      <set-backend-service base-url="https://internal-api.siva.local" />
+    </when>
+    <otherwise>
+      <set-backend-service base-url="https://public-api.default.local" />
+    </otherwise>
+  </choose>
+</inbound>
+```
