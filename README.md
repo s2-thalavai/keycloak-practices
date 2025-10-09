@@ -124,12 +124,13 @@ Open PowerShell:
 
 ```powershell
 cd C:\Keycloak\bin
+kc.bat bootstrap-admin --user admin --password admin
 .\kc.bat start-dev
 ```
 
 Access Keycloak at: http://localhost:8080
 
-<img width="1366" height="728" alt="image" src="https://github.com/user-attachments/assets/9c42def0-9869-48b3-aaf7-0a4e29624eb9" />
+<img width="1206" height="679" alt="image" src="https://github.com/user-attachments/assets/b2a32bf3-e190-4d18-bd01-c04cf7276edc" />
 
 
 ### Create Admin User
@@ -387,6 +388,10 @@ Allow users to log in via external IdPs (Google, Azure AD, etc.)
 4. Enable **Account Linking** if needed
 5. Test login flow via `/auth/realms/<realm>/account`
 
+<img width="1350" height="652" alt="image" src="https://github.com/user-attachments/assets/06b9f69d-fc1d-469b-8f5f-bf5e9ce13e6b" />
+
+<img width="1347" height="649" alt="image" src="https://github.com/user-attachments/assets/56e6b345-585a-4fcf-9a2f-2a7b2cbb375e" />
+
 ### Visual Flow
 - App → Keycloak → External IdP → Keycloak → App
 - Use curved arrows to show redirect-based login
@@ -456,3 +461,78 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 - Use SAML if you're integrating with legacy enterprise systems or existing SAML-based IdPs.
   
 ---
+
+# OpenID Connect Setup & Browser Test in Keycloak
+
+## Register a Client (OIDC Application)
+
+Go to Clients → Create
+
+Fill in:
+
+- Client ID: my-react-app (or any name)
+
+- Client Type: OpenID Connect
+
+- Client Protocol: openid-connect
+
+- **Root URL:** http://localhost:3000 (or your app’s URL)
+
+- Click Save
+
+### Configure Client Settings
+
+In the client settings page:
+
+- **Access Type:** public (for SPAs) or confidential (for backend apps)
+
+- **Standard Flow Enabled:** ✅ (for Authorization Code Flow)
+
+- **Implicit Flow Enabled:** ❌ (deprecated)
+
+- **Direct Access Grants Enabled:** ✅ (optional for testing)
+
+- **Valid Redirect URIs:** http://localhost:3000/*
+
+- **Web Origins:** + (auto-fill from redirect URI)
+
+- Click Save
+
+### Add a Test User
+
+- Go to Users → Add User
+
+- Fill in username, email, etc.
+
+- Click Save
+
+Go to Credentials tab → Set password → Toggle "Temporary" to OFF → Save
+
+### Test OpenID Connect Flow from Browser
+
+Use this URL format to initiate login:
+
+```
+http://localhost:8180/realms/is_apps/protocol/openid-connect/auth?
+client_id=external_users_client
+&response_type=code
+&scope=openid
+&redirect_uri=http://localhost:3000/callback
+&code_challenge=1qwwqwq2223qwwwqwqwqwq23323-8787wqwqwq67676
+&code_challenge_method=S256
+```
+
+<img width="1365" height="723" alt="image" src="https://github.com/user-attachments/assets/65e3e498-f54d-4e36-8d83-6df729556130" />
+
+<img width="1366" height="727" alt="image" src="https://github.com/user-attachments/assets/5d9c4a1b-8a4d-431a-a0f9-5ebc81f1de37" />
+
+
+```
+http://localhost:3000/callback?
+session_state=e50b2571-b0c3-ecdb-68e9-57ab4e5a66f2
+&iss=http%3A%2F%2Flocalhost%3A8180%2Frealms
+%2Fis_apps
+&code=62a9c087-ceef-6e95-474f-a3d00ddbe782.e50b2571-b0c3-ecdb-68e9-57ab4e5a66f2.fdf3e954-8038-4c46-9fef-ee46665c046b
+```
+
+Paste this into your browser. You’ll be redirected to Keycloak’s login screen. After login, Keycloak will redirect to your app with a code in the URL.
