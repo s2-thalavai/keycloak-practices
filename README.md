@@ -137,10 +137,10 @@ Open PowerShell:
 $env:KC_ADMIN_PASSWORD = "admin"
 cd C:\keycloak\keycloak-26.4.0\bin
 .\kc.bat bootstrap-admin user --username admin --password:env KC_ADMIN_PASSWORD --optimized
-.\kc.bat start-dev --http-port=9000
+.\kc.bat start-dev --http-port=9090
 ```
 
-Access Keycloak at: http://localhost:9000
+Access Keycloak at: http://localhost:9090
 
 <img width="1206" height="679" alt="image" src="https://github.com/user-attachments/assets/b2a32bf3-e190-4d18-bd01-c04cf7276edc" />
 
