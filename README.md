@@ -518,7 +518,7 @@ client_id=external_users_client
 &response_type=code
 &scope=openid
 &redirect_uri=http://localhost:3000/callback
-&code_challenge=1qwwqwq2223qwwwqwqwqwq23323-8787wqwqwq67676
+&code_challenge=Xdhz6EE3Molukkc0IDRyQJCXxjPsvbJr8VqO2kHo2gU
 &code_challenge_method=S256
 ```
 
@@ -528,11 +528,49 @@ client_id=external_users_client
 
 
 ```
-http://localhost:3000/callback?
+[http://localhost:3000/callback?
 session_state=e50b2571-b0c3-ecdb-68e9-57ab4e5a66f2
 &iss=http%3A%2F%2Flocalhost%3A8180%2Frealms
 %2Fis_apps
-&code=62a9c087-ceef-6e95-474f-a3d00ddbe782.e50b2571-b0c3-ecdb-68e9-57ab4e5a66f2.fdf3e954-8038-4c46-9fef-ee46665c046b
+&code=62a9c087-ceef-6e95-474f-a3d00ddbe782.e50b2571-b0c3-ecdb-68e9-57ab4e5a66f2.fdf3e954-8038-4c46-9fef-ee46665c046b](http://localhost:3000/callback?session_state=42ff1da3-0ec9-9800-d32b-284f8c4a778d&iss=http%3A%2F%2Flocalhost%3A8180%2Frealms%2Fis_apps
+&code=108997e7-918d-2a50-e54f-7e78cd4257fa.42ff1da3-0ec9-9800-d32b-284f8c4a778d.fdf3e954-8038-4c46-9fef-ee46665c046b)
 ```
 
 Paste this into your browser. You’ll be redirected to Keycloak’s login screen. After login, Keycloak will redirect to your app with a code in the URL.
+
+---
+
+## Step-by-Step: Exchange Authorization Code for Tokens (PKCE)
+
+### Step 1: Send a POST Request to Token Endpoint
+Endpoint:
+
+#### Example with curl
+```bash
+curl -X POST http://localhost:8180/realms/is_apps/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=authorization_code" \
+  -d "client_id=external_users_client" \
+  -d "code=108997e7-918d-2a50-e54f-7e78cd4257fa.42ff1da3-0ec9-9800-d32b-284f8c4a778d.fdf3e954-8038-4c46-9fef-ee46665c046b" \
+  -d "redirect_uri=http://localhost:3000/callback" \
+  -d 'code_verifier=acDUDY-d6GDppRvgyfm157qtbivtluO6HbenFUumRI1qqNXpQ9varQJQmaXDoXCFpkMHhV4At7yhJC-G1eVyrxEkBdKx1NUGOwAjky869_U7n07CiO0xeFOsoREONke7'
+```
+
+### Response
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJfSVlHdVBpeGJCbXBHWEZYNDhfNnJPLWlXSWNfY3U1cTg3WUlqSlE2cFpnIn0.eyJleHAiOjE3NTk5ODQyMDcsImlhdCI6MTc1OTk4MzkwNywiYXV0aF90aW1lIjoxNzU5OTgzNjUxLCJqdGkiOiJvbnJ0YWM6MDE5YTYxYzktODBhNC0yOTY2LTkwZTItNmQ3MWJiZmRlN2Q4IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL3JlYWxtcy9pc19hcHBzIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6Ijk4NzY4MjExLWQ1YWEtNDExOC1iZDlhLWZlZjIzZTAyZDY1NSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImV4dGVybmFsX3VzZXJzX2NsaWVudCIsInNpZCI6IjQyZmYxZGEzLTBlYzktOTgwMC1kMzJiLTI4NGY4YzRhNzc4ZCIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDozMDAwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJvZmZsaW5lX2FjY2VzcyIsImRlZmF1bHQtcm9sZXMtaXNfYXBwcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6IlNpdmFzYW5rYXIgVGhhbGF2YWkiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzaXZhc2Fua2FydGhhbGF2YWkiLCJnaXZlbl9uYW1lIjoiU2l2YXNhbmthciIsImZhbWlseV9uYW1lIjoiVGhhbGF2YWkiLCJlbWFpbCI6InNpdmFzYW5rYXIudGhhbGF2YWlAbWFybGFicy5jb20ifQ.WaRkEaAWJJY8grFX7K_-5hUqWhqUC9gAI1lAn7-Y5ksRfUyZqyDbvj18YTaAf1vZBkM4Afwz3RDPvd_JIfM2psI_2yhTUWJRTfJZ4cTgK_PuyNfyYfcfeIqA6UxxhW6QFAJpw7vBx7vrEZfBmWe8Rk1mZnysRPpTY8pN9YP4vhhxSVkP7f0_XNyXST2Cu35AlB9EcPL_2m4e-s4z3cg9ZsNUMnpaWVea4F1SqKj4wNWr1O16J3zukcKs1_c8OwcWRhLjzXXbANWa_Bf9hshKtZl55b6H8ZDn4JQMg8MunQv0aud_orGAUCQjlZfFGUP8mp0Paz9E-eoxEEXKZKuzOw",
+  "expires_in": 300,
+  "refresh_expires_in": 1800,
+  "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIzNWZjMzk0MS1kNDU3LTRhMDktYmQ2Mi01YzE1OWI1MzJiYzIifQ.eyJleHAiOjE3NTk5ODU3MDcsImlhdCI6MTc1OTk4MzkwNywianRpIjoiNzNjY2E3ZTUtODUwYS1mNmQ0LWE2YjAtZmI3MDQ5NTMwZGU4IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL3JlYWxtcy9pc19hcHBzIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL3JlYWxtcy9pc19hcHBzIiwic3ViIjoiOTg3NjgyMTEtZDVhYS00MTE4LWJkOWEtZmVmMjNlMDJkNjU1IiwidHlwIjoiUmVmcmVzaCIsImF6cCI6ImV4dGVybmFsX3VzZXJzX2NsaWVudCIsInNpZCI6IjQyZmYxZGEzLTBlYzktOTgwMC1kMzJiLTI4NGY4YzRhNzc4ZCIsInNjb3BlIjoib3BlbmlkIGVtYWlsIGJhc2ljIHByb2ZpbGUgcm9sZXMgYWNyIHdlYi1vcmlnaW5zIn0.m7p81cs69z8e_KfjLWaNE46IuxHc8GkEZWsvSpr8WlqYu--KNE25Sl2BhgFCH-ycJsZ0DNB5L_vrs5bwf8kIiw",
+  "token_type": "Bearer",
+  "id_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJfSVlHdVBpeGJCbXBHWEZYNDhfNnJPLWlXSWNfY3U1cTg3WUlqSlE2cFpnIn0.eyJleHAiOjE3NTk5ODQyMDcsImlhdCI6MTc1OTk4MzkwNywiYXV0aF90aW1lIjoxNzU5OTgzNjUxLCJqdGkiOiI4Y2JkNDZhZS1lYWVlLWI4Y2QtNzRkNi01ODcyNjBhNzU4MTkiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgxODAvcmVhbG1zL2lzX2FwcHMiLCJhdWQiOiJleHRlcm5hbF91c2Vyc19jbGllbnQiLCJzdWIiOiI5ODc2ODIxMS1kNWFhLTQxMTgtYmQ5YS1mZWYyM2UwMmQ2NTUiLCJ0eXAiOiJJRCIsImF6cCI6ImV4dGVybmFsX3VzZXJzX2NsaWVudCIsInNpZCI6IjQyZmYxZGEzLTBlYzktOTgwMC1kMzJiLTI4NGY4YzRhNzc4ZCIsImF0X2hhc2giOiJ1MGc3d3piRXUzbUFDakxhUzA1eWJRIiwiYWNyIjoiMCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6IlNpdmFzYW5rYXIgVGhhbGF2YWkiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzaXZhc2Fua2FydGhhbGF2YWkiLCJnaXZlbl9uYW1lIjoiU2l2YXNhbmthciIsImZhbWlseV9uYW1lIjoiVGhhbGF2YWkiLCJlbWFpbCI6InNpdmFzYW5rYXIudGhhbGF2YWlAbWFybGFicy5jb20ifQ.VfF_IGUmJllCnJz6Ch0MF7WB5pHpgJqmBovKmlA8Cun-Y3aLe7n7SxifXyD3NQ_uSmXVLJ-lWxKsYj_EP-Zz2LXIMPg-pBxE3dwdg5ILqRRUTa3wfV5iarG86bfi-zDUgKk1NgEiMlzQQPeM-9Knu5wm-vKr4VHoOXQ3GGsJKfR8M2-zGfxHWL3GWRop2vwH8yzNQL5lSpbua1wlugXfBqkNqfqm1R6REUxsiQgsyhr5aq5zEbE9-8JLVrv_d4YKgo6ZjB1RN9BoSh0ESsYVz6LPkP8mkw4jb6ZlHNpeU51bmT8BuvNZCw9siBmZjx7bvWB3fCqyjPxzgNNoOIk0zw",
+  "not-before-policy": 0,
+  "session_state": "42ff1da3-0ec9-9800-d32b-284f8c4a778d",
+  "scope": "openid email profile"
+}
+```
+
+
+Would you like me to scaffold a React or Spring Boot client that automates this flow with PKCE? I can also help you diagram the token exchange with your visual language — rectangles, redirect arrows, and browser hops.
