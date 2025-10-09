@@ -1,5 +1,8 @@
 # keycloak-practices
 
+- OpenID Connect
+- Magic Link
+
 ## Why Enterprises Need Keycloak: Strategic IAM Overview
 
 ### What Is Keycloak?
@@ -734,3 +737,17 @@ Confirm aud, iss, and exp match your policy
   </choose>
 </inbound>
 ```
+
+---
+
+# Magic Link (Email-Based)
+
+- 1. Install keycloak-magic-link
+
+- 2. Create a custom flow with Magic Link Authenticator
+
+- 3. Configure SMTP settings for email delivery
+
+- 4. Customize email templates if needed
+
+Users enter their email → receive a secure login link → click to authenticate.
