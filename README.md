@@ -4,7 +4,7 @@
 
 ### What Is Keycloak?
 
-Keycloak is an open-source Identity and Access Management (IAM) system that provides:
+Keycloak is an **open-source Identity and Access Management (IAM)** system that provides:
 
 - Authentication (who you are)
 
@@ -61,6 +61,7 @@ It supports standard protocols like:
 - **UI-agnostic:** React, Angular, Struts, etc.
 
 ---
+
 ## Step-by-Step: Keycloak + PostgreSQL on Windows Server
 
 ### Prerequisites
@@ -344,3 +345,114 @@ Introduced in Keycloak 26+, this feature enables multi-tenancy within a single r
 - Use custom attributes for org metadata
 
 - Externalize org configs via REST API for CI/CD
+
+---
+
+## Keycloak Admin Console Setup
+
+### Accessing the Console
+- URL: `http://<host>:8080/auth`
+- Default realm: `master`
+- Default admin user: `admin`
+- Default password: `admin` (change immediately)
+
+### Key Concepts
+| Term         | Description |
+|--------------|-------------|
+| Realm        | Logical tenant for users, clients, roles |
+| Client       | Application registered with Keycloak |
+| Role         | Permission grouping |
+| Group        | User grouping |
+| Identity Provider | External source of user identities |
+
+---
+
+### Common Tasks
+
+- Create a new realm
+- Add users manually or via import
+- Configure password policies
+- Assign roles and groups
+
+## Identity Brokering with Keycloak
+
+### Use Case
+
+Allow users to log in via external IdPs (Google, Azure AD, etc.)
+
+### Steps
+1. Go to **Identity Providers** in your realm
+2. Choose provider type (e.g., OpenID Connect, SAML)
+3. Enter client ID, secret, and endpoints
+4. Enable **Account Linking** if needed
+5. Test login flow via `/auth/realms/<realm>/account`
+
+### Visual Flow
+- App → Keycloak → External IdP → Keycloak → App
+- Use curved arrows to show redirect-based login
+
+---
+
+## Spring Boot + Keycloak Integration
+
+### Dependencies
+
+```xml
+<dependency>
+  <groupId>org.keycloak</groupId>
+  <artifactId>keycloak-spring-boot-starter</artifactId>
+</dependency>
+```
+
+### Configuration
+
+```yaml
+keycloak:
+  realm: demo
+  auth-server-url: http://localhost:8080/auth
+  resource: spring-app
+  credentials:
+    secret: <client-secret>
+```
+
+### Securing Endpoints
+
+```java
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.authorizeRequests()
+        .antMatchers("/admin/**").hasRole("admin")
+        .anyRequest().permitAll();
+  }
+}
+```
+
+---
+
+
+## OpenID Connect vs SAML: Authentication Showdown
+
+| Feature                      | OpenID Connect (OIDC)                          | SAML 2.0                                      |
+|-----------------------------|-----------------------------------------------|-----------------------------------------------|
+| Protocol Type               | RESTful, JSON-based                           | XML-based                                     |
+| Transport Format            | JSON over HTTP                                | XML over HTTP (often via POST or Redirect)    |
+| Token Format                | JWT (JSON Web Token)                          | SAML Assertions (XML)                         |
+| Mobile & SPA Friendly       | ✅ Excellent for mobile apps & SPAs           | 🚫 Not ideal for mobile or JavaScript clients |
+| Modern Web Integration      | ✅ Built for OAuth flows                      | 🚫 Legacy browser-based flows                 |
+| Ease of Implementation      | ✅ Lightweight, developer-friendly            | ⚠️ Verbose, XML-heavy                         |
+| Identity Federation         | ✅ Supported via Identity Brokering           | ✅ Supported                                   |
+| SSO Support                 | ✅ Yes                                        | ✅ Yes                                         |
+| Standard Adoption           | Widely used in modern apps (Google, Azure AD) | Common in legacy enterprise apps              |
+| Security Features           | Strong with PKCE, nonce, scopes               | Strong but harder to implement securely       |
+
+---
+
+## Recommendation
+
+- Use **OpenID Connect** if you're building modern web apps, mobile apps, SPAs, or integrating with OAuth-based ecosystems.
+
+- Use SAML if you're integrating with legacy enterprise systems or existing SAML-based IdPs.
+  
+---
