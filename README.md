@@ -571,6 +571,122 @@ curl -X POST http://localhost:8180/realms/is_apps/protocol/openid-connect/token 
   "scope": "openid email profile"
 }
 ```
+---
 
+# Token Verification in Azure APIM (Keycloak OIDC)
 
-Would you like me to scaffold a React or Spring Boot client that automates this flow with PKCE? I can also help you diagram the token exchange with your visual language — rectangles, redirect arrows, and browser hops.
+## Step 1: Get Keycloak’s OpenID Configuration
+
+Keycloak exposes its metadata at:
+
+```Code
+http://<keycloak-host>/realms/<realm-name>/.well-known/openid-configuration
+```
+
+Example for your setup:
+
+```Code
+http://localhost:8180/realms/is_apps/.well-known/openid-configuration
+```
+
+From this, extract:
+
+- issuer
+
+- jwks_uri (for public key verification)
+
+- token_endpoint
+
+## Step 2: Configure Azure APIM JWT Validation Policy
+
+In your API policy (e.g., inbound section), add:
+
+```xml
+<validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized">
+  <openid-config url="http://localhost:8180/realms/is_apps/.well-known/openid-configuration" />
+  <required-claims>
+    <claim name="aud">
+      <value>external_users_client</value>
+    </claim>
+    <claim name="iss">
+      <value>http://localhost:8180/realms/is_apps</value>
+    </claim>
+  </required-claims>
+</validate-jwt>
+```
+
+This ensures APIM validates the token’s signature, issuer, and audience.
+
+## Step 3: Test with a Valid Token
+Send a request to your APIM endpoint with:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+If the token is valid and matches the claims, APIM will allow the request to proceed.
+
+----
+
+# Azure APIM Policy: Keycloak Token Verification
+
+## 1. Validate JWT from Keycloak
+
+Place this inside your API’s inbound policy:
+
+```xml
+<validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized">
+  <openid-config url="http://localhost:8180/realms/is_apps/.well-known/openid-configuration" />
+  <required-claims>
+    <claim name="aud">
+      <value>external_users_client</value>
+    </claim>
+    <claim name="iss">
+      <value>http://localhost:8180/realms/is_apps</value>
+    </claim>
+  </required-claims>
+</validate-jwt>
+```
+
+✅ This verifies the token’s signature, issuer, and audience using Keycloak’s JWKS.
+
+## 2. Optional: Role-Based Access Control
+
+Add this after validate-jwt to restrict access by role:
+
+```xml
+<choose>
+  <when condition="@(context.Principal.Claims.Any(c => c.Type == 'realm_access.roles' && c.Value.Contains('admin')))">
+    <!-- Allow access -->
+  </when>
+  <otherwise>
+    <return-response>
+      <set-status code="403" reason="Forbidden" />
+      <set-body>Access denied: insufficient role</set-body>
+    </return-response>
+  </otherwise>
+</choose>
+```
+
+Adjust admin to match your Keycloak role mappings.
+
+## 3. Optional: Conditional Routing Based on Claims
+
+```xml
+<choose>
+  <when condition="@(context.Principal.Claims.Any(c => c.Type == 'preferred_username' && c.Value == 'siva'))">
+    <set-backend-service base-url="https://internal-api.siva.local" />
+  </when>
+  <otherwise>
+    <set-backend-service base-url="https://public-api.default.local" />
+  </otherwise>
+</choose>
+```
+
+## 4. Testing Tips
+
+Use access_token (not id_token) for API calls
+
+Inspect tokens at jwt.ms
+
+Confirm aud, iss, and exp match your policy
