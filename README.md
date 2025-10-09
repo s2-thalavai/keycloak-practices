@@ -121,6 +121,14 @@ db-password=secret
 hostname-strict=false
 ```
 
+## Create Permanent Admin User in Keycloak 26.4.0
+
+```powershell
+$env:KC_ADMIN_PASSWORD = "yourSecurePassword"
+.\kc.bat bootstrap-admin user --username admin --password:env KC_ADMIN_PASSWORD
+.\kc.bat build
+```
+
 ### Start Keycloak
 
 Open PowerShell:
