@@ -128,7 +128,7 @@ Open PowerShell:
 ```powershell
 $env:KC_ADMIN_PASSWORD = "admin"
 cd C:\keycloak\keycloak-26.4.0\bin
-.\kc.bat bootstrap-admin user --username admin --password:env KC_ADMIN_PASSWORD
+kc.bat bootstrap-admin user --username admin --password:env KC_ADMIN_PASSWORD --optimized
 .\kc.bat start-dev --http-port=8180
 ```
 
