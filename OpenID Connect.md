@@ -22,11 +22,11 @@ In the client settings page:
 
 - **Access Type:** public (for SPAs) or confidential (for backend apps)
 
-- **Standard Flow Enabled:** ✅ (for Authorization Code Flow)
+- **Standard Flow Enabled:** (for Authorization Code Flow)
 
-- **Implicit Flow Enabled:** ❌ (deprecated)
+- **Implicit Flow Enabled:** (deprecated)
 
-- **Direct Access Grants Enabled:** ✅ (optional for testing)
+- **Direct Access Grants Enabled:** (optional for testing)
 
 - **Valid Redirect URIs:** http://localhost:3000/*
 
