@@ -456,11 +456,11 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 | Protocol Type               | RESTful, JSON-based                           | XML-based                                     |
 | Transport Format            | JSON over HTTP                                | XML over HTTP (often via POST or Redirect)    |
 | Token Format                | JWT (JSON Web Token)                          | SAML Assertions (XML)                         |
-| Mobile & SPA Friendly       | ✅ Excellent for mobile apps & SPAs           | 🚫 Not ideal for mobile or JavaScript clients |
-| Modern Web Integration      | ✅ Built for OAuth flows                      | 🚫 Legacy browser-based flows                 |
-| Ease of Implementation      | ✅ Lightweight, developer-friendly            | ⚠️ Verbose, XML-heavy                         |
-| Identity Federation         | ✅ Supported via Identity Brokering           | ✅ Supported                                   |
-| SSO Support                 | ✅ Yes                                        | ✅ Yes                                         |
+| Mobile & SPA Friendly       |  Excellent for mobile apps & SPAs           |  Not ideal for mobile or JavaScript clients |
+| Modern Web Integration      | Built for OAuth flows                      |  Legacy browser-based flows                 |
+| Ease of Implementation      | Lightweight, developer-friendly            |  Verbose, XML-heavy                         |
+| Identity Federation         | Supported via Identity Brokering           |  Supported                                   |
+| SSO Support                 | Yes                                        |  Yes                                         |
 | Standard Adoption           | Widely used in modern apps (Google, Azure AD) | Common in legacy enterprise apps              |
 | Security Features           | Strong with PKCE, nonce, scopes               | Strong but harder to implement securely       |
 
